@@ -5,182 +5,686 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>தமிழ் பேச்சு உரை மாற்றி</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Tamil MN', 'Latha', Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            font-family: 'Tamil MN', 'Latha', 'Noto Sans Tamil', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             padding: 20px;
-            background-color: #f5f5f5;
         }
+
         .container {
+            max-width: 900px;
+            margin: 0 auto;
             background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
         }
-        button {
-            background-color: #4CAF50;
+
+        .header {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
             color: white;
-            padding: 15px 30px;
-            font-size: 18px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            padding: 25px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 600;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            margin: 10px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 120px;
+            justify-content: center;
         }
-        button:hover {
-            background-color: #45a049;
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
         }
-        button:disabled {
-            background-color: #cccccc;
+
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ff9800;
+            color: white;
+        }
+
+        .btn-info {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background: #e3f2fd;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ccc;
+        }
+
+        .status-dot.listening {
+            background: #4CAF50;
+            box-shadow: 0 0 10px #4CAF50;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .stats {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .editor-container {
+            padding: 25px;
+        }
+
         #output {
             width: 100%;
-            height: 200px;
-            margin-top: 20px;
-            padding: 15px;
+            height: 300px;
+            padding: 20px;
             font-size: 18px;
             border: 2px solid #ddd;
-            border-radius: 5px;
+            border-radius: 10px;
             resize: vertical;
-            font-family: 'Tamil MN', 'Latha', Arial, sans-serif;
+            font-family: 'Tamil MN', 'Latha', 'Noto Sans Tamil', Arial, sans-serif;
+            line-height: 1.6;
+            background: #fff;
+            transition: border-color 0.3s ease;
         }
-        .status {
-            margin: 10px 0;
-            padding: 10px;
+
+        #output:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 12px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #6c757d;
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .error {
+            background: #f44336;
+        }
+
+        @media (max-width: 768px) {
+            .button-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 250px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-btn {
+                width: 100%;
+                max-width: 250px;
+            }
+            
+            .status-bar {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+
+        .correction-suggestions {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f8ff;
+            border-radius: 8px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .suggestion-item {
+            display: inline-block;
+            margin: 5px;
+            padding: 8px 12px;
+            background: #e3f2fd;
             border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
         }
-        .listening {
-            background-color: #e8f5e8;
-            border: 1px solid #4CAF50;
+
+        .suggestion-item:hover {
+            background: #bbdefb;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>தமிழ் பேச்சு உரை மாற்றி</h1>
-        <p>பேசவும் - உங்கள் பேச்சு உரையாக மாற்றப்படும்</p>
-        
-        <button id="startBtn">🎙️ பேசவும்</button>
-        <button id="stopBtn" disabled>⏹️ நிறுத்து</button>
-        <button id="clearBtn">🗑️ அழி</button>
-        
-        <div id="status" class="status"></div>
-        <textarea id="output" placeholder="உங்கள் உரை இங்கே தோன்றும்..."></textarea>
+        <div class="header">
+            <h1>🎙️ தமிழ் பேச்சு உரை மாற்றி</h1>
+            <p>உங்கள் குரலை உரையாக மாற்றுங்கள் - ஆவணங்களை எளிதாக உருவாக்குங்கள்</p>
+        </div>
+
+        <div class="controls">
+            <div class="button-group">
+                <button id="startBtn" class="btn btn-primary">
+                    <span>▶️ தொடங்கு</span>
+                </button>
+                <button id="pauseBtn" class="btn btn-warning" disabled>
+                    <span>⏸️ இடைநிறுத்து</span>
+                </button>
+                <button id="stopBtn" class="btn btn-danger" disabled>
+                    <span>⏹️ நிறுத்து</span>
+                </button>
+                <button id="clearBtn" class="btn btn-info">
+                    <span>🗑️ அழி</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-indicator">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText">தயார் - பேசவும்</span>
+            </div>
+            <div class="stats">
+                <span id="wordCount">சொற்கள்: 0</span> | 
+                <span id="charCount">எழுத்துகள்: 0</span>
+            </div>
+        </div>
+
+        <div class="editor-container">
+            <textarea 
+                id="output" 
+                placeholder="உங்கள் பேச்சு இங்கே தோன்றும்...&#10;&#10;தொடங்கு பொத்தானை அழுத்தி பேசவும்.">
+            </textarea>
+
+            <div class="correction-suggestions" id="correctionSuggestions" style="display: none;">
+                <h4>திருத்த பரிந்துரைகள்:</h4>
+                <div id="suggestionsList"></div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="copyBtn" class="action-btn">
+                    <span>📋 நகலெடு</span>
+                </button>
+                <button id="saveBtn" class="action-btn">
+                    <span>💾 சேமி</span>
+                </button>
+                <button id="autoCorrectBtn" class="action-btn">
+                    <span>🔧 தானியங்கி திருத்தம்</span>
+                </button>
+                <button id="speakBtn" class="action-btn">
+                    <span>🔊 படிக்கவும்</span>
+                </button>
+            </div>
+        </div>
     </div>
+
+    <div class="toast" id="toast"></div>
 
     <script>
         class TamilSpeechToText {
             constructor() {
                 this.recognition = null;
+                this.isListening = false;
+                this.isPaused = false;
+                this.finalTranscript = '';
+                this.interimTranscript = '';
                 this.initializeRecognition();
                 this.setupEventListeners();
+                this.updateStats();
             }
 
             initializeRecognition() {
-                // Check if browser supports SpeechRecognition
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 
                 if (!SpeechRecognition) {
-                    alert('உங்கள் உலாவி பேச்சு உரை மாற்றியை ஆதரிக்கவில்லை. Chrome அல்லது Edge பயன்படுத்தவும்.');
+                    this.showToast('உங்கள் உலாவி பேச்சு உரை மாற்றியை ஆதரிக்கவில்லை. Chrome அல்லது Edge பயன்படுத்தவும்.', 'error');
                     return;
                 }
 
                 this.recognition = new SpeechRecognition();
                 this.recognition.continuous = true;
                 this.recognition.interimResults = true;
-                this.recognition.lang = 'ta-IN'; // Tamil language
+                this.recognition.lang = 'ta-IN';
+                this.recognition.maxAlternatives = 3;
 
                 this.setupRecognitionEvents();
             }
 
             setupRecognitionEvents() {
                 this.recognition.onstart = () => {
+                    this.isListening = true;
+                    this.isPaused = false;
                     this.updateStatus('🎙️ கேட்கிறது... பேசவும்', 'listening');
-                    document.getElementById('startBtn').disabled = true;
-                    document.getElementById('stopBtn').disabled = false;
+                    this.updateButtons();
                 };
 
                 this.recognition.onresult = (event) => {
+                    if (this.isPaused) return;
+
                     let finalTranscript = '';
                     let interimTranscript = '';
 
                     for (let i = event.resultIndex; i < event.results.length; i++) {
                         const transcript = event.results[i][0].transcript;
                         if (event.results[i].isFinal) {
-                            finalTranscript += transcript;
+                            finalTranscript += transcript + ' ';
                         } else {
                             interimTranscript += transcript;
                         }
                     }
 
                     this.updateOutput(finalTranscript, interimTranscript);
+                    this.updateStats();
                 };
 
                 this.recognition.onerror = (event) => {
                     this.updateStatus(`பிழை: ${event.error}`, 'error');
-                    this.resetButtons();
+                    this.isListening = false;
+                    this.updateButtons();
+                    this.showToast(`பிழை: ${event.error}`, 'error');
                 };
 
                 this.recognition.onend = () => {
-                    this.updateStatus('🛑 நிறுத்தப்பட்டது');
-                    this.resetButtons();
+                    if (this.isListening && !this.isPaused) {
+                        this.updateStatus('🛑 நிறுத்தப்பட்டது');
+                        this.isListening = false;
+                        this.updateButtons();
+                    } else if (this.isPaused) {
+                        this.updateStatus('⏸️ இடைநிறுத்தப்பட்டது');
+                    }
                 };
             }
 
             setupEventListeners() {
+                // Main control buttons
                 document.getElementById('startBtn').addEventListener('click', () => this.start());
+                document.getElementById('pauseBtn').addEventListener('click', () => this.pause());
                 document.getElementById('stopBtn').addEventListener('click', () => this.stop());
                 document.getElementById('clearBtn').addEventListener('click', () => this.clear());
+
+                // Action buttons
+                document.getElementById('copyBtn').addEventListener('click', () => this.copyToClipboard());
+                document.getElementById('saveBtn').addEventListener('click', () => this.saveToFile());
+                document.getElementById('autoCorrectBtn').addEventListener('click', () => this.autoCorrect());
+                document.getElementById('speakBtn').addEventListener('click', () => this.speakText());
+
+                // Text area changes
+                document.getElementById('output').addEventListener('input', () => this.updateStats());
             }
 
             start() {
-                if (this.recognition) {
-                    try {
-                        this.recognition.start();
-                    } catch (error) {
-                        console.error('Error starting recognition:', error);
-                        this.updateStatus('பிழை: ' + error.message, 'error');
+                if (!this.recognition) {
+                    this.showToast('பேச்சு உரை மாற்றி கிடைக்கவில்லை', 'error');
+                    return;
+                }
+
+                if (this.isPaused) {
+                    this.resume();
+                    return;
+                }
+
+                try {
+                    this.recognition.start();
+                } catch (error) {
+                    if (error.name === 'InvalidStateError') {
+                        this.recognition.stop();
+                        setTimeout(() => this.recognition.start(), 100);
+                    } else {
+                        this.updateStatus(`பிழை: ${error.message}`, 'error');
+                        this.showToast(`பிழை: ${error.message}`, 'error');
                     }
                 }
             }
 
+            pause() {
+                this.isPaused = true;
+                this.updateStatus('⏸️ இடைநிறுத்தப்பட்டது');
+                this.updateButtons();
+            }
+
+            resume() {
+                this.isPaused = false;
+                this.updateStatus('🎙️ மீண்டும் கேட்கிறது...', 'listening');
+                this.updateButtons();
+            }
+
             stop() {
-                if (this.recognition) {
+                if (this.recognition && this.isListening) {
                     this.recognition.stop();
+                    this.isListening = false;
+                    this.isPaused = false;
+                    this.updateStatus('🛑 நிறுத்தப்பட்டது');
+                    this.updateButtons();
                 }
             }
 
             clear() {
                 document.getElementById('output').value = '';
-                this.updateStatus('');
+                this.finalTranscript = '';
+                this.interimTranscript = '';
+                this.updateStats();
+                this.updateStatus('தெளிவாக்கப்பட்டது');
+                this.hideSuggestions();
+                this.showToast('உரை தெளிவாக்கப்பட்டது');
             }
 
             updateOutput(finalText, interimText) {
                 const output = document.getElementById('output');
+                this.interimTranscript = interimText;
+                
                 if (finalText) {
-                    output.value += finalText;
+                    this.finalTranscript += finalText;
+                    output.value = this.finalTranscript + this.interimTranscript;
+                } else {
+                    output.value = this.finalTranscript + this.interimTranscript;
                 }
-                // For interim results, you might want to show them differently
-                // This example just appends final results
+
+                // Auto-scroll to bottom
+                output.scrollTop = output.scrollHeight;
             }
 
-            updateStatus(message, className = '') {
-                const status = document.getElementById('status');
-                status.textContent = message;
-                status.className = `status ${className}`;
+            updateStatus(message, type = '') {
+                const statusText = document.getElementById('statusText');
+                const statusDot = document.getElementById('statusDot');
+                
+                statusText.textContent = message;
+                statusDot.className = 'status-dot';
+                
+                if (type === 'listening') {
+                    statusDot.classList.add('listening');
+                } else if (type === 'error') {
+                    statusDot.style.background = '#f44336';
+                } else {
+                    statusDot.style.background = '#ccc';
+                }
             }
 
-            resetButtons() {
-                document.getElementById('startBtn').disabled = false;
-                document.getElementById('stopBtn').disabled = true;
+            updateButtons() {
+                const startBtn = document.getElementById('startBtn');
+                const pauseBtn = document.getElementById('pauseBtn');
+                const stopBtn = document.getElementById('stopBtn');
+
+                if (this.isListening && !this.isPaused) {
+                    startBtn.disabled = true;
+                    pauseBtn.disabled = false;
+                    stopBtn.disabled = false;
+                    startBtn.innerHTML = '<span>▶️ மீண்டும் தொடங்கு</span>';
+                } else if (this.isPaused) {
+                    startBtn.disabled = false;
+                    pauseBtn.disabled = true;
+                    stopBtn.disabled = false;
+                    startBtn.innerHTML = '<span>▶️ மீண்டும் தொடங்கு</span>';
+                } else {
+                    startBtn.disabled = false;
+                    pauseBtn.disabled = true;
+                    stopBtn.disabled = true;
+                    startBtn.innerHTML = '<span>▶️ தொடங்கு</span>';
+                }
+            }
+
+            updateStats() {
+                const text = document.getElementById('output').value;
+                const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+                const charCount = text.length;
+
+                document.getElementById('wordCount').textContent = `சொற்கள்: ${wordCount}`;
+                document.getElementById('charCount').textContent = `எழுத்துகள்: ${charCount}`;
+            }
+
+            copyToClipboard() {
+                const output = document.getElementById('output');
+                const text = output.value;
+                
+                if (!text.trim()) {
+                    this.showToast('நகலெடுக்க உரை இல்லை');
+                    return;
+                }
+
+                navigator.clipboard.writeText(text).then(() => {
+                    this.showToast('உரை நகலெடுக்கப்பட்டது!');
+                }).catch(err => {
+                    this.showToast('நகலெடுப்பதில் பிழை: ' + err, 'error');
+                });
+            }
+
+            saveToFile() {
+                const text = document.getElementById('output').value;
+                
+                if (!text.trim()) {
+                    this.showToast('சேமிக்க உரை இல்லை');
+                    return;
+                }
+
+                const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+                a.href = url;
+                a.download = `தமிழ்_ஆவணம்_${timestamp}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                this.showToast('ஆவணம் சேமிக்கப்பட்டது!');
+            }
+
+            autoCorrect() {
+                const output = document.getElementById('output');
+                let text = output.value;
+                
+                if (!text.trim()) {
+                    this.showToast('திருத்த உரை இல்லை');
+                    return;
+                }
+
+                // Basic Tamil auto-correction rules
+                const corrections = {
+                    'க்க': 'க்',
+                    'ப்ப': 'ப்',
+                    'த்த': 'த்',
+                    'ந்ந': 'ந்',
+                    'ம்ம': 'ம்',
+                    'ய்ய': 'ய்',
+                    'ர்ர': 'ர்',
+                    'ல்ல': 'ல்',
+                    'வ்வ': 'வ்',
+                    'ழ்ழ': 'ழ்',
+                    'ள்ள': 'ள்',
+                    'ற்ற': 'ற்',
+                    'ன்ன': 'ன்'
+                };
+
+                // Apply corrections
+                Object.keys(corrections).forEach(key => {
+                    const regex = new RegExp(key, 'g');
+                    text = text.replace(regex, corrections[key]);
+                });
+
+                // Remove extra spaces
+                text = text.replace(/\s+/g, ' ').trim();
+
+                output.value = text;
+                this.finalTranscript = text;
+                this.updateStats();
+                this.showToast('தானியங்கி திருத்தம் முடிந்தது!');
+            }
+
+            speakText() {
+                const text = document.getElementById('output').value;
+                
+                if (!text.trim()) {
+                    this.showToast('படிக்க உரை இல்லை');
+                    return;
+                }
+
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'ta-IN';
+                    utterance.rate = 0.9;
+                    utterance.pitch = 1;
+                    speechSynthesis.speak(utterance);
+                    this.showToast('உரை படிக்கப்படுகிறது...');
+                } else {
+                    this.showToast('உங்கள் உலாவி படிப்பு அம்சத்தை ஆதரிக்கவில்லை', 'error');
+                }
+            }
+
+            showToast(message, type = '') {
+                const toast = document.getElementById('toast');
+                toast.textContent = message;
+                toast.className = 'toast';
+                
+                if (type === 'error') {
+                    toast.classList.add('error');
+                }
+                
+                toast.classList.add('show');
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+
+            hideSuggestions() {
+                document.getElementById('correctionSuggestions').style.display = 'none';
             }
         }
 
         // Initialize the app when page loads
         document.addEventListener('DOMContentLoaded', () => {
             new TamilSpeechToText();
+        });
+
+        // Handle page visibility changes to prevent recognition issues
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // Pause recognition when tab is not visible
+                const event = new CustomEvent('visibilitychange');
+                document.dispatchEvent(event);
+            }
         });
     </script>
 </body>
