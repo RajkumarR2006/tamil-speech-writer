@@ -45,7 +45,7 @@
                 <!-- Status indicator section -->
                 <div id="status" class="flex items-center justify-center space-x-3 bg-gray-100 p-4 rounded-lg mb-6 transition-all duration-300">
                     <div id="record-indicator" class="w-4 h-4 rounded-full bg-gray-400"></div>
-                    <span id="status-text" class="font-semibold text-gray-600 text-center">Press 'Start Listening' to begin.</span>
+                    <span id="status-text" class="font-semibold text-gray-600 text-center">Press 'Start' to begin.</span>
                 </div>
 
                 <!-- Text area for the transcript with spellcheck enabled -->
@@ -168,17 +168,21 @@
                 recognition.stop();
             });
 
+            // *** FIX: Corrected the logic for pausing and resuming ***
             pauseButton.addEventListener('click', () => {
-                if (!isListening || !recognition) return;
+                if (!recognition) return;
 
-                if (!isPaused) { // We want to pause
+                // Case 1: We are actively listening and want to PAUSE.
+                if (isListening && !isPaused) {
                     isPaused = true;
                     recognition.stop(); // This will trigger onend, but isPaused flag will prevent full UI reset
                     updateUIForPause();
-                } else { // We want to resume
+                } 
+                // Case 2: We are paused and want to RESUME.
+                else if (!isListening && isPaused) {
                     isPaused = false;
                     recognition.start();
-                    // onstart will handle the UI update
+                    // onstart will handle the UI update to "listening" state
                 }
             });
             
@@ -244,7 +248,7 @@
             stopButton.disabled = true;
             pauseButton.disabled = true;
             pauseButton.innerHTML = `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg><span>Pause</span>`;
-            statusText.textContent = "Press 'Start Listening' to begin.";
+            statusText.textContent = "Press 'Start' to begin.";
             recordIndicator.classList.remove('bg-red-500', 'blinking');
             recordIndicator.classList.add('bg-gray-400');
         }
