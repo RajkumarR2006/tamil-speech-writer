@@ -25,6 +25,11 @@
         .blinking {
             animation: blink 1.5s infinite;
         }
+        /* Ensure disabled buttons have a consistent, clear style */
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
@@ -40,27 +45,35 @@
                 <!-- Status indicator section -->
                 <div id="status" class="flex items-center justify-center space-x-3 bg-gray-100 p-4 rounded-lg mb-6 transition-all duration-300">
                     <div id="record-indicator" class="w-4 h-4 rounded-full bg-gray-400"></div>
-                    <span id="status-text" class="font-semibold text-gray-600">Press 'Start Listening' to begin.</span>
+                    <span id="status-text" class="font-semibold text-gray-600 text-center">Press 'Start Listening' to begin.</span>
                 </div>
 
-                <!-- Text area for the transcript -->
+                <!-- Text area for the transcript with spellcheck enabled -->
                 <div class="relative">
-                    <textarea id="transcript" class="w-full h-96 p-4 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow duration-300 resize-none" placeholder="உங்கள் பேச்சு இங்கே உரையாகத் தோன்றும்..."></textarea>
+                    <textarea id="transcript" class="w-full h-96 p-4 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow duration-300 resize-none" placeholder="உங்கள் பேச்சு இங்கே உரையாகத் தோன்றும்..." spellcheck="true" lang="ta"></textarea>
                 </div>
 
                 <!-- Action buttons section -->
-                <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <button id="startButton" class="w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
-                        <span>Start Listening</span>
+                <div class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                    <button id="startButton" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                        <span>Start</span>
                     </button>
-                    <button id="stopButton" class="w-full bg-red-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-300 transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2" disabled>
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd"></path></svg>
-                        <span>Stop Listening</span>
+                    <button id="pauseButton" class="w-full bg-yellow-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-4 focus:ring-yellow-300 transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2" disabled>
+                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                        <span>Pause</span>
                     </button>
-                    <button id="copyButton" class="w-full bg-gray-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-4 focus:ring-gray-300 transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                        <span>Copy Text</span>
+                    <button id="stopButton" class="w-full bg-red-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-300 transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2" disabled>
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd"></path></svg>
+                        <span>Stop</span>
+                    </button>
+                    <button id="copyButton" class="w-full bg-gray-700 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-4 focus:ring-gray-300 transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        <span>Copy</span>
+                    </button>
+                    <button id="clearButton" class="w-full bg-gray-400 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-500 focus:outline-none focus:ring-4 focus:ring-gray-300 transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2 col-span-2 sm:col-span-1 md:col-span-1">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                        <span>Clear</span>
                     </button>
                 </div>
                  <!-- Message box for notifications -->
@@ -82,7 +95,9 @@
         // Get references to all the necessary DOM elements
         const startButton = document.getElementById('startButton');
         const stopButton = document.getElementById('stopButton');
+        const pauseButton = document.getElementById('pauseButton');
         const copyButton = document.getElementById('copyButton');
+        const clearButton = document.getElementById('clearButton');
         const transcriptArea = document.getElementById('transcript');
         const statusDiv = document.getElementById('status');
         const statusText = document.getElementById('status-text');
@@ -90,6 +105,8 @@
         const messageBox = document.getElementById('messageBox');
 
         let final_transcript = '';
+        let isListening = false;
+        let isPaused = false;
 
         if (recognition) {
             // --- Configure the Speech Recognition ---
@@ -98,95 +115,94 @@
             recognition.interimResults = true; // Show results as they are being recognized
 
             // --- Event Handlers ---
-
-            // This event fires when the recognition service starts listening
             recognition.onstart = () => {
-                // Update UI to reflect the "listening" state
-                startButton.disabled = true;
-                stopButton.disabled = false;
-                statusText.textContent = 'Listening... Please speak clearly.';
-                recordIndicator.classList.add('bg-red-500', 'blinking');
-                recordIndicator.classList.remove('bg-gray-400');
+                isListening = true;
+                updateUIForListening();
             };
 
-            // This event fires when the recognition service stops
             recognition.onend = () => {
-                // Update UI to reflect the "stopped" state
-                startButton.disabled = false;
-                stopButton.disabled = true;
-                statusText.textContent = "Press 'Start Listening' to begin.";
-                recordIndicator.classList.remove('bg-red-500', 'blinking');
-                recordIndicator.classList.add('bg-gray-400');
+                isListening = false;
+                // Only reset to the "fully stopped" state if we didn't intentionally pause.
+                if (!isPaused) {
+                    updateUIForStop();
+                }
             };
             
-            // This event fires when there is an error
             recognition.onerror = (event) => {
                 console.error("Speech recognition error:", event.error);
-                // Provide more helpful error messages to the user
                 if (event.error === 'no-speech') {
                     statusText.textContent = "I didn't hear that. Please check your microphone and try again.";
-                } else if (event.error === 'not-allowed') {
+                } else if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
                     statusText.textContent = "Microphone access denied. Please allow microphone access in your browser settings.";
                 } else {
                     statusText.textContent = `Error: ${event.error}. Please try again.`;
                 }
+                isListening = false;
+                updateUIForStop();
             };
 
-            // This is the main event handler that processes the speech
             recognition.onresult = (event) => {
                 let interim_transcript = '';
-                // Loop through all the results from the current recognition
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    // If the result is final, append it to the final transcript
                     if (event.results[i].isFinal) {
-                        final_transcript += event.results[i][0].transcript + ' '; // Add a space after each final part
+                        final_transcript += event.results[i][0].transcript + ' ';
                     } else {
-                        // Otherwise, it's an interim result, so add it to the interim transcript
                         interim_transcript += event.results[i][0].transcript;
                     }
                 }
-                // Update the text area with the final transcript and the current interim part
                 transcriptArea.value = final_transcript + interim_transcript;
             };
 
             // --- Button Click Listeners ---
-
-            // Start button: starts the speech recognition
             startButton.addEventListener('click', () => {
-                // Clear previous transcript and start listening
-                final_transcript = '';
+                if (isListening) return;
+                final_transcript = ''; // Reset transcript only on a fresh start
                 transcriptArea.value = '';
+                isPaused = false;
                 recognition.start();
             });
 
-            // Stop button: stops the speech recognition
             stopButton.addEventListener('click', () => {
+                if (!isListening) return;
+                isPaused = false;
                 recognition.stop();
             });
 
-            // Copy button: copies the text from the text area to the clipboard
+            pauseButton.addEventListener('click', () => {
+                if (!isListening || !recognition) return;
+
+                if (!isPaused) { // We want to pause
+                    isPaused = true;
+                    recognition.stop(); // This will trigger onend, but isPaused flag will prevent full UI reset
+                    updateUIForPause();
+                } else { // We want to resume
+                    isPaused = false;
+                    recognition.start();
+                    // onstart will handle the UI update
+                }
+            });
+            
+            clearButton.addEventListener('click', () => {
+                transcriptArea.value = '';
+                final_transcript = '';
+            });
+
             copyButton.addEventListener('click', () => {
                 if (transcriptArea.value) {
-                    // Create a temporary textarea to execute the copy command
                     const tempTextArea = document.createElement('textarea');
                     tempTextArea.value = transcriptArea.value;
                     document.body.appendChild(tempTextArea);
                     tempTextArea.select();
                     try {
                         document.execCommand('copy');
-                        // Show a success message
                         messageBox.classList.remove('opacity-0');
-                        setTimeout(() => {
-                           messageBox.classList.add('opacity-0');
-                        }, 2000);
+                        setTimeout(() => { messageBox.classList.add('opacity-0'); }, 2000);
                     } catch (err) {
                         console.error('Failed to copy text: ', err);
-                        // Use a custom message box instead of alert
                         statusText.textContent = 'Sorry, could not copy text.';
                     }
                     document.body.removeChild(tempTextArea);
                 } else {
-                    // Use a custom message box instead of alert
                     statusText.textContent = 'There is no text to copy!';
                 }
             });
@@ -196,10 +212,43 @@
             statusText.textContent = "Sorry, your browser does not support Speech Recognition. Please use Google Chrome or Microsoft Edge.";
             startButton.disabled = true;
             stopButton.disabled = true;
+            pauseButton.disabled = true;
             copyButton.disabled = true;
+            clearButton.disabled = true;
             statusDiv.classList.add('bg-red-100');
             statusDiv.classList.remove('bg-gray-100');
         }
+
+        // --- UI Update Functions ---
+        function updateUIForListening() {
+            startButton.disabled = true;
+            stopButton.disabled = false;
+            pauseButton.disabled = false;
+            pauseButton.innerHTML = `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg><span>Pause</span>`;
+            statusText.textContent = 'Listening... Please speak clearly.';
+            recordIndicator.classList.add('bg-red-500', 'blinking');
+            recordIndicator.classList.remove('bg-gray-400');
+        }
+
+        function updateUIForPause() {
+            startButton.disabled = true; // Still can't start a new session
+            stopButton.disabled = false; // Can still stop completely
+            pauseButton.disabled = false;
+            pauseButton.innerHTML = `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"></path></svg><span>Resume</span>`;
+            statusText.textContent = "Paused. Press 'Resume' to continue.";
+            recordIndicator.classList.remove('blinking'); // Stop blinking when paused
+        }
+
+        function updateUIForStop() {
+            startButton.disabled = false;
+            stopButton.disabled = true;
+            pauseButton.disabled = true;
+            pauseButton.innerHTML = `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg><span>Pause</span>`;
+            statusText.textContent = "Press 'Start Listening' to begin.";
+            recordIndicator.classList.remove('bg-red-500', 'blinking');
+            recordIndicator.classList.add('bg-gray-400');
+        }
+
     </script>
 </body>
 </html>
