@@ -351,6 +351,7 @@
                 this.isPaused = false;
                 this.finalTranscript = '';
                 this.interimTranscript = '';
+                this.continuousRecognition = false; // Flag to track continuous recognition
                 this.initializeRecognition();
                 this.setupEventListeners();
                 this.updateStats();
@@ -405,6 +406,15 @@
                     this.isListening = false;
                     this.updateButtons();
                     this.showToast(`பிழை: ${event.error}`, 'error');
+                    
+                    // If continuous recognition is enabled, restart after error
+                    if (this.continuousRecognition && this.isListening) {
+                        setTimeout(() => {
+                            if (this.isListening && !this.isPaused) {
+                                this.startRecognition();
+                            }
+                        }, 1000);
+                    }
                 };
 
                 this.recognition.onend = () => {
@@ -412,6 +422,15 @@
                         this.updateStatus('🛑 நிறுத்தப்பட்டது');
                         this.isListening = false;
                         this.updateButtons();
+                        
+                        // If continuous recognition is enabled, restart after end
+                        if (this.continuousRecognition) {
+                            setTimeout(() => {
+                                if (this.isListening && !this.isPaused) {
+                                    this.startRecognition();
+                                }
+                            }, 100);
+                        }
                     } else if (this.isPaused) {
                         this.updateStatus('⏸️ இடைநிறுத்தப்பட்டது');
                     }
@@ -446,12 +465,21 @@
                     return;
                 }
 
+                this.continuousRecognition = true;
+                this.startRecognition();
+            }
+
+            startRecognition() {
                 try {
                     this.recognition.start();
                 } catch (error) {
                     if (error.name === 'InvalidStateError') {
                         this.recognition.stop();
-                        setTimeout(() => this.recognition.start(), 100);
+                        setTimeout(() => {
+                            if (this.continuousRecognition && this.isListening && !this.isPaused) {
+                                this.recognition.start();
+                            }
+                        }, 100);
                     } else {
                         this.updateStatus(`பிழை: ${error.message}`, 'error');
                         this.showToast(`பிழை: ${error.message}`, 'error');
@@ -463,12 +491,21 @@
                 this.isPaused = true;
                 this.updateStatus('⏸️ இடைநிறுத்தப்பட்டது');
                 this.updateButtons();
+                
+                // Stop recognition but keep the state
+                if (this.recognition && this.isListening) {
+                    this.recognition.stop();
+                }
             }
 
             resume() {
                 this.isPaused = false;
                 this.updateStatus('🎙️ மீண்டும் கேட்கிறது...', 'listening');
                 this.updateButtons();
+                
+                // Restart recognition to continue from where we left off
+                this.continuousRecognition = true;
+                this.startRecognition();
             }
 
             stop() {
@@ -476,6 +513,7 @@
                     this.recognition.stop();
                     this.isListening = false;
                     this.isPaused = false;
+                    this.continuousRecognition = false; // Disable continuous recognition
                     this.updateStatus('🛑 நிறுத்தப்பட்டது');
                     this.updateButtons();
                 }
